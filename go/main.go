@@ -8,40 +8,45 @@ import (
 )
 
 func main() {
-	s := loadStr()
-	fmt.Println(s)
+	nextReader = newScanner()
+	x := nextInt()
+	var m2 = make([]byte, 0, x)
+	for i := 0; i < x; i++ {
+		m2 = append(m2, nextString()...)
+	}
+	fmt.Println(string(m2))
 }
 
-func loadStr() string {
-	var sc = bufio.NewScanner(os.Stdin)
-	sc.Scan()
-	return sc.Text()
-}
+var nextReader func() string
 
-func loadints(n int) []int {
-	xs := make([]int, n)
-	sc := bufio.NewScanner(os.Stdin)
-	sc.Split(bufio.ScanWords)
+func newScanner() func() string {
+	r := bufio.NewScanner(os.Stdin)
+	r.Buffer(make([]byte, 1024), int(1e+11))
+	r.Split(bufio.ScanWords)
+	return func() string {
+		r.Scan()
+		return r.Text()
+	}
+}
+func nextString() string {
+	return nextReader()
+}
+func nextInt64() int64 {
+	v, _ := strconv.ParseInt(nextReader(), 10, 64)
+	return v
+}
+func nextInt() int {
+	v, _ := strconv.Atoi(nextReader())
+	return v
+}
+func nextInts(n int) []int {
+	r := make([]int, n)
 	for i := 0; i < n; i++ {
-		sc.Scan()
-		xs[i], _ = strconv.Atoi(sc.Text())
+		r[i] = nextInt()
 	}
-	return xs
+	return r
 }
-
-func loadLongStr(length int) string {
-	len := length
-	if len < 0 {
-		len = 1000000
-	}
-	var rdr = bufio.NewReaderSize(os.Stdin, len)
-	buf := make([]byte, 0, len)
-	for {
-		l, p, _ := rdr.ReadLine()
-		buf = append(buf, l...)
-		if !p {
-			break
-		}
-	}
-	return string(buf)
+func nextFloat64() float64 {
+	f, _ := strconv.ParseFloat(nextReader(), 64)
+	return f
 }
