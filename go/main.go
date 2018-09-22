@@ -9,12 +9,15 @@ import (
 
 func main() {
 	nextReader = newScanner()
-	x := nextInt()
-	var m2 = make([]byte, 0, x)
-	for i := 0; i < x; i++ {
-		m2 = append(m2, nextString()...)
+	n := nextInt()
+	N := nextInts(n)
+	count := 0
+	for i := 1; i < n-1; i++ {
+		if N[i-1] < N[i] && N[i+1] < N[i] {
+			count++
+		}
 	}
-	fmt.Println(string(m2))
+	fmt.Println(count)
 }
 
 var nextReader func() string
@@ -43,6 +46,13 @@ func nextInts(n int) []int {
 	r := make([]int, n)
 	for i := 0; i < n; i++ {
 		r[i] = nextInt()
+	}
+	return r
+}
+func nextInt64s(n int) []int64 {
+	r := make([]int64, n)
+	for i := 0; i < n; i++ {
+		r[i] = nextInt64()
 	}
 	return r
 }
