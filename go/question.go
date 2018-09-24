@@ -52,3 +52,27 @@ func q4() {
 	}
 	fmt.Println(count)
 }
+
+func q5() {
+	nextReader = newScanner()
+	nextInt()
+	K := nextInt()
+	S := nextString()
+	fmt.Println(q5a(K, S[:len(S)-1]))
+}
+
+func q5a(K int, S string) int {
+	if len(S) <= K {
+		return 1
+	}
+	for i := K; i > 0; i-- {
+		if S[i] == '.' {
+			count := foo(K, S[i:])
+			if count == -1 {
+				return count
+			}
+			return count + 1
+		}
+	}
+	return -1
+}

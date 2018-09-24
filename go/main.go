@@ -10,24 +10,25 @@ import (
 func main() {
 	nextReader = newScanner()
 	nextInt()
+	K := nextInt()
 	S := nextString()
-	var count int64
-	m := map[int32]int64{}
-	for _, c := range S {
-		_, ok := m[c]
-		if ok {
-			m[c]++
-		} else {
-			m[c] = 1
+	fmt.Println(foo(K, S[:len(S)-1]))
+}
+
+func foo(K int, S string) int {
+	if len(S) <= K {
+		return 1
+	}
+	for i := K; i > 0; i-- {
+		if S[i] == '.' {
+			count := foo(K, S[i:])
+			if count == -1 {
+				return count
+			}
+			return count + 1
 		}
 	}
-	for k, v := range m {
-		v2, ok := m[k+1]
-		if ok {
-			count = count + v*v2
-		}
-	}
-	fmt.Println(count)
+	return -1
 }
 
 var nextReader func() string
