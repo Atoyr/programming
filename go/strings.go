@@ -30,3 +30,9 @@ func split(base string, splitstr string) {
 func join(strs []string, sep string) {
 	fmt.Println(strings.Join(strs, sep))
 }
+
+func foreach(base string) {
+	for i, c := range base {
+		fmt.Printf("char %c pos %d", c, i)
+	}
+}
