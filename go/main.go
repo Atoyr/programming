@@ -9,26 +9,16 @@ import (
 
 func main() {
 	nextReader = newScanner()
-	nextInt()
-	K := nextInt()
-	S := nextString()
-	fmt.Println(foo(K, S[:len(S)-1]))
-}
-
-func foo(K int, S string) int {
-	if len(S) <= K {
-		return 1
-	}
-	for i := K; i > 0; i-- {
-		if S[i] == '.' {
-			count := foo(K, S[i:])
-			if count == -1 {
-				return count
-			}
-			return count + 1
+	x := nextInt()
+	a := nextInt()
+	count := 0
+	for {
+		if ((x+count)%a == 0) || ((x-count)%a == 0) {
+			break
 		}
+		count = count + 1
 	}
-	return -1
+	fmt.Println(count)
 }
 
 var nextReader func() string

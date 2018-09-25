@@ -67,7 +67,7 @@ func q5a(K int, S string) int {
 	}
 	for i := K; i > 0; i-- {
 		if S[i] == '.' {
-			count := foo(K, S[i:])
+			count := q5a(K, S[i:])
 			if count == -1 {
 				return count
 			}
@@ -75,4 +75,18 @@ func q5a(K int, S string) int {
 		}
 	}
 	return -1
+}
+
+func q7() {
+	nextReader = newScanner()
+	x := nextInt()
+	a := nextInt()
+	count := 0
+	for {
+		if ((x+count)%a == 0) || ((x-count)%a == 0) {
+			break
+		}
+		count = count + 1
+	}
+	fmt.Println(count)
 }
