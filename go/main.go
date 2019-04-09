@@ -9,16 +9,32 @@ import (
 
 func main() {
 	nextReader = newScanner()
-	x := nextInt()
-	a := nextInt()
-	count := 0
-	for {
-		if ((x+count)%a == 0) || ((x-count)%a == 0) {
-			break
-		}
-		count = count + 1
+	N := nextInt()
+	W := nextInt()
+	values := make([]int, 110) // [0 0 0]
+	weights := make([]int, 110) // [0 0 0]
+
+	dp := make([][]int, 110) // [0 0 0]
+	for i := range dp {
+		dp[i] = make([]int, 10100) // [0 0 0]
 	}
-	fmt.Println(count)
+
+	
+	for i :=0 ; i < N ; i++{
+		values[i] = nextInt()
+		weights[i] = nextInt()
+	}
+
+	for i := 0; i < N ; i++{
+		for w := 0; w <= W ; w++{
+			if (w >= weights[i]) {
+				dp[i+1][w] = maxInt(dp[i][w-weights[i]] + values[i], dp[i][w])
+			}else {
+				dp[i+1][w] = dp[i][w]
+			}
+		}
+	}
+	fmt.Print(dp[N][W])
 }
 
 var nextReader func() string
@@ -60,4 +76,12 @@ func nextInt64s(n int) []int64 {
 func nextFloat64() float64 {
 	f, _ := strconv.ParseFloat(nextReader(), 64)
 	return f
+}
+
+func maxInt(a,b int) int {
+	if a > b {
+		return a
+	} else {
+		return b
+	}
 }

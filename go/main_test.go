@@ -1,117 +1,99 @@
 package main
 
-
-
 import (
+	"os"
+	"io"
+	"strings"
+	"strconv"
+	"testing"
+)
 
-    "io"
+type testValue struct {
+	arg []string
+	ans string
+}
 
-    "os"
+func getTests() []testValue{
+	testValues := []testValue{
+		testValue{ 
+			[]string{ 
+				"4 5", 
+				"4 2",
+				"5 2",
+				"2 1",
+				"8 3",
+			} ,
+		"13" },
+		testValue{ 
+			[]string{ 
+				"2 20",
+				"5 9",
+				"4 10",
+			} ,
+		"9"},
+	}
 
-    "strconv"
-
-    "strings"
-
-    "testing"
-
-    )
-
-
-
-func captureStdout(f func()) string {
-
-  r, w, err := os.Pipe()
-
-    if err != nil {
-
-      panic(err)
-
-    }
-
-
-
-stdout := os.Stdout
-
-          os.Stdout = w
-
-
-
-          outC := make(chan string)
-
-          defer close(outC)
-
-          go func() {
-
-            var buf strings.Builder
-
-              io.Copy(&buf, r)
-
-              r.Close()
-
-              outC <- buf.String()
-
-          }()
-
-
-
-        f()
-
-
-
-          os.Stdout = stdout
-
-          w.Close()
-
-
-
-          return <-outC
-
+	return testValues
 }
 
 
+func stubio(inbuf string, f func()) (string,string) {
+	inr, inw, _ := os.Pipe()
+	outr, outw, _ := os.Pipe()
+	errr, errw, _ := os.Pipe()
+
+	orgStdin := os.Stdin
+	orgStdout := os.Stdout
+	orgStderr := os.Stderr
+
+	inw.Write([]byte(inbuf))
+	inw.Close()
+
+	os.Stdin = inr
+	os.Stdout = outw
+	os.Stderr = errw
+
+	outC := make(chan string)
+	errC := make(chan string)
+	defer close(outC)
+	defer close(errC)
+	go func() {
+		var buf strings.Builder
+		io.Copy(&buf,outr)
+		outr.Close()
+		outC <- buf.String()
+	}()
+
+	go func() {
+		var buf strings.Builder
+		io.Copy(&buf,errr)
+		errr.Close()
+		errC <- buf.String()
+	}()
+
+	f()
+	
+	os.Stdin = orgStdin
+	os.Stdout = orgStdout
+	os.Stderr = orgStderr
+	outw.Close()
+	errw.Close()
+
+	return <-outC,<-errC
+}
 
 func Test_main(t *testing.T) {
-
-tests := []struct {
-
-         arg string
-
-           ans string
-
-       }{
-
-         {"1,2", "3"},
-
-           {"3,3", "6"},
-
-           {"3,3", "0"}, // This case will return FAIL.
-
-           // TODO: Add test cases.
-
-       }
-
-argsbuf := os.Args
-
-           for i, tt := range tests {
-
-si := strconv.Itoa(i)
-
-      t.Run("Case "+si, func(t *testing.T) {
-
-          os.Args = argsbuf
-
-          os.Args = append(os.Args, tt.arg)
-
-          ret := captureStdout(main)
-
-          if ret != tt.ans {
-
-          t.Errorf("Unexpected output: %s Need: %s", ret, tt.ans)
-
-          }
-
-          })
-
-           }
-
+	tests := getTests()
+	for i, tt := range tests {
+		si := strconv.Itoa(i)
+		t.Run("Case "+si, func(t *testing.T) {
+			ret,err := stubio(strings.Join(tt.arg," "),main)
+			if err != "" {
+				t.Errorf("error func: %s ", err)
+			}
+			if ret != tt.ans {
+				t.Errorf("Unexpected output: '%s' Need: '%s'", ret, tt.ans)
+			}
+		})
+	}
 }
